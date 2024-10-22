@@ -12,8 +12,7 @@ class User(baseModel):
             self.email = email
         self.is_admin = is_admin
         self.places = []
-
-        
+        self.reviews = []      
     
     @staticmethod
     def validate_name(name):
@@ -23,9 +22,18 @@ class User(baseModel):
     
     @staticmethod
     def validate_email(email):
+        """check if email format is valid format"""
         ## check if email is in db
         pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
         if re.match(pattern, email):
             return True
         else:
             raise ValueError("email not valid")
+
+    def add_review(self, review):
+        """Link a review to a user"""
+        self.reviews.append(review)
+
+    def add_place(self, place):
+        """Add a owned place to a user"""
+        self.places.append(place)
