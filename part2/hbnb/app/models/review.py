@@ -13,7 +13,7 @@ class Review(baseModel):
             self.rating = rating
         else:
             raise ValueError("rating must be between 1 and 5")
-        if isinstance(user, User):
+        if isinstance(user, User) and user_exists(user):
             self.user = user
         else:
             raise ValueError("invalid user")
@@ -21,3 +21,14 @@ class Review(baseModel):
             self.place = place
         else:
             raise ValueError("invalid place")
+        #user.add_review(self)
+        #place.add_review(self)
+
+    @staticmethod
+    def user_exists(user):
+        """check if the user is in the db"""
+        return True # Placeholder for real user check logic
+    @staticmethod
+    def place_exists(place):
+        """check if the place is in the db"""
+        return True # Placeholder for real db check logic
