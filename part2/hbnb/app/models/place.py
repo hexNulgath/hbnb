@@ -26,6 +26,9 @@ class Place(baseModel):
         else:
             raise ValueError("invalid user")
         self.amenities = []
+        self.reviews = []  # List to store related reviews
+        self.amenities = []  # List to store related amenities
+        owner.add_place(self)
 
     @staticmethod
     def validate_title(title):
@@ -35,4 +38,8 @@ class Place(baseModel):
     
     def add_amenities(self, amenity):
         self.amenity.append(amenity)
+
+    def add_review(self, review):
+    """Add a review to the place."""
+        self.reviews.append(review)
 
