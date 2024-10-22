@@ -1,9 +1,8 @@
-import part2.hbnb.app.models.baseModel as baseModel
+from app.models.baseModel import BaseModel
 import re
 
-
-class User(baseModel):
-    def __init__(self, first_name, last_name, email, password, is_admin=False):
+class User(BaseModel):
+    def __init__(self, first_name, last_name, email, is_admin=False):
         super().__init__()
         if self.validate_name(first_name) and self.validate_name(last_name):
             self.first_name = first_name

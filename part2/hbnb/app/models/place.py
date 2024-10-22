@@ -1,9 +1,8 @@
-import part2.hbnb.app.models.baseModel as baseModel
-import part2.hbnb.app.models.user as User
+from app.models.baseModel import BaseModel
+from app.models.user import User
 
-
-class Place(baseModel):
-    def __init__(self, title, price, latitude, longitude, owner, amenities, description=""):
+class Place(BaseModel):
+    def __init__(self, title, price, latitude, longitude, owner, description=""):
         super().__init__()
         if self.validate_title(title):
             self.title = title
@@ -11,21 +10,20 @@ class Place(baseModel):
             self.price = price
         else:
             raise ValueError("price must be a positive value")
-        if longitude > -180 and longitude < 180:
+        if -180 < longitude < 180:
             self.longitude = longitude
         else:
             raise ValueError("longitude invalid")
-        if latitude > -90 and latitude < 90:
+        if -90 < latitude < 90:
             self.latitude = latitude
         else:
             raise ValueError("latitude invalid")
         self.description = description
-        ## chack if user is in db
+        # Check if owner is a valid User instance
         if isinstance(owner, User):
             self.owner = owner
         else:
             raise ValueError("invalid user")
-        self.amenities = []
         self.reviews = []  # List to store related reviews
         self.amenities = []  # List to store related amenities
         owner.add_place(self)
@@ -37,9 +35,9 @@ class Place(baseModel):
         return True 
     
     def add_amenities(self, amenity):
-        self.amenity.append(amenity)
+        """Add an amenity to the place."""
+        self.amenities.append(amenity)
 
     def add_review(self, review):
-    """Add a review to the place."""
+        """Add a review to the place."""
         self.reviews.append(review)
-

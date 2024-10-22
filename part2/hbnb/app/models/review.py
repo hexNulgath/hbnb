@@ -1,34 +1,46 @@
-import part2.hbnb.app.models.baseModel as baseModel
-import part2.hbnb.app.models.user as User
-import part2.hbnb.app.models.place as Place
+from app.models.baseModel import BaseModel
+from app.models.user import User
+from app.models.place import Place
 
-class Review(baseModel):
+class Review(BaseModel):
     def __init__(self, text, rating, place, user):
         super().__init__()
+        # Validate text
         if text:
             self.text = text
         else:
             raise ValueError("text content is required")
-        if rating > 0 and rating < 5:
+
+        # Validate rating between 1 and 5
+        if 1 <= rating <= 5:
             self.rating = rating
         else:
             raise ValueError("rating must be between 1 and 5")
-        if isinstance(user, User) and user_exists(user):
+
+        # Check if user is valid and exists
+        if isinstance(user, User) and self.user_exists(user):
             self.user = user
         else:
             raise ValueError("invalid user")
-        if isinstance(place, Place):
+
+        # Check if place is valid and exists
+        if isinstance(place, Place) and self.place_exists(place):
             self.place = place
         else:
             raise ValueError("invalid place")
-        #user.add_review(self)
-        #place.add_review(self)
+
+        # Link the review to the user and place
+        ##user.add_review(self)
+        ##place.add_review(self)
 
     @staticmethod
     def user_exists(user):
-        """check if the user is in the db"""
-        return True # Placeholder for real user check logic
+        """Check if the user exists in the database."""
+        # Replace with actual logic to check if the user is in the database
+        return True
+
     @staticmethod
     def place_exists(place):
-        """check if the place is in the db"""
-        return True # Placeholder for real db check logic
+        """Check if the place exists in the database."""
+        # Replace with actual logic to check if the place is in the database
+        return True
