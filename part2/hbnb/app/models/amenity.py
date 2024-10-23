@@ -2,7 +2,7 @@ from app.models.baseModel import BaseModel
 
 class Amenity(BaseModel):
     def __init__(self, name):
-        super().__init__()  # Call the BaseModel constructor
+        super().__init__()
         if self.validate_name(name):
             self.name = name
 
