@@ -1,6 +1,8 @@
 from flask_restx import Namespace, Resource, fields
 from app.services.facade import HBnBFacade
+from app.models.user import User
 from flask import jsonify
+import json
 
 api = Namespace('users', description='User operations')
 
@@ -30,7 +32,17 @@ class UserList(Resource):
 
         new_user = facade.create_user(user_data)
         return {'id': new_user.id, 'first_name': new_user.first_name, 'last_name': new_user.last_name, 'email': new_user.email}, 201
-    
+
+    def get(self):
+        """Get all users"""
+        user_list = facade.get_all_user()
+        if not user_list:
+            return {'error': 'user list not found'}, 500
+        def serialize(obj):
+            if isinstance(obj, User):
+                return {'first_name': obj.first_name, 'last_name': obj.last_name, 'email': obj.email, 'id': obj.id}
+        return json.dumps(user_list, default=serialize)
+        
 @api.route('/<user_id>')
 class UserResource(Resource):
     @api.response(200, 'User details retrieved successfully')
@@ -41,3 +53,4 @@ class UserResource(Resource):
         if not user:
             return {'error': 'User not found'}, 404
         return {'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email}, 200
+ 
