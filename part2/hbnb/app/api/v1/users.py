@@ -59,6 +59,7 @@ class UserResource(Resource):
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
+        
         else:
             facade.update_user(user_id, user_data)
 
