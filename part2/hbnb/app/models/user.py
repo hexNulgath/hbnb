@@ -15,7 +15,7 @@ class User(BaseModel):
     
     @staticmethod
     def validate_name(name):
-        if name and len(name) > 50:
+        if name and len(name) > 50 or name == "":
             raise ValueError("maximum length of 50 characters")
         return True 
     

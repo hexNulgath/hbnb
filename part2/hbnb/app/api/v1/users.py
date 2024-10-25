@@ -36,6 +36,8 @@ class UserList(Resource):
             return {'error': 'Email already registered'}, 400
 
         new_user = facade.create_user(user_data)
+        if not new_user:
+            return {'error': 'Invalid input data'}, 400
         return marshal(new_user, user_output_model), 201
     
     @api.response(200, 'User details retrieved successfully', model=[user_output_model])

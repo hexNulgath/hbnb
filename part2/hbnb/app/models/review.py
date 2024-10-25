@@ -1,12 +1,11 @@
 from app.models.baseModel import BaseModel
-from app.models.user import User
-from app.models.place import Place
+import app.services.facade as facade
 
 class Review(BaseModel):
     def __init__(self, text, rating, place_id, user_id):
         super().__init__()
         # Validate text
-        if text:
+        if text and text is not "":
             self.text = text
         else:
             raise ValueError("text content is required")
@@ -17,17 +16,29 @@ class Review(BaseModel):
         else:
             raise ValueError("rating must be between 1 and 5")
 
-        self.place_id = place_id
-        self.user_id = user_id
+        if self.place_exists(place_id):
+            self.place_id = place_id
+        else:
+            raise ValueError("place not found")  
+              
+        if self.user_exists(user_id):
+            self.user_id = user_id
+        else:
+            raise ValueError("user not found")
+
 
     @staticmethod
     def user_exists(user):
         """Check if the user exists in the database."""
-        # Replace with actual logic to check if the user is in the database
-        return True
+        user_exist = facade.HBnBFacade.get_user(user)
+        if user_exist:
+            return True
+        return False
 
     @staticmethod
     def place_exists(place):
         """Check if the place exists in the database."""
-        # Replace with actual logic to check if the place is in the database
-        return True
+        place_exist = HBnBFacade.get_place(place)
+        if place_exist:
+            return True
+        return False
