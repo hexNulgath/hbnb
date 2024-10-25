@@ -3,7 +3,7 @@ from app.models.user import User
 from app.models.place import Place
 
 class Review(BaseModel):
-    def __init__(self, text, rating, place, user):
+    def __init__(self, text, rating, place_id, user_id):
         super().__init__()
         # Validate text
         if text:
@@ -17,21 +17,8 @@ class Review(BaseModel):
         else:
             raise ValueError("rating must be between 1 and 5")
 
-        # Check if user is valid and exists
-        if isinstance(user, User) and self.user_exists(user):
-            self.user = user
-        else:
-            raise ValueError("invalid user")
-
-        # Check if place is valid and exists
-        if isinstance(place, Place) and self.place_exists(place):
-            self.place = place
-        else:
-            raise ValueError("invalid place")
-
-        # Link the review to the user and place
-        ##user.add_review(self)
-        ##place.add_review(self)
+        self.place_id = place_id
+        self.user_id = user_id
 
     @staticmethod
     def user_exists(user):

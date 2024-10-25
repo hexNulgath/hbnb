@@ -2,7 +2,7 @@ from app.models.baseModel import BaseModel
 from app.models.user import User
 
 class Place(BaseModel):
-    def __init__(self, title, price, latitude, longitude, owner, description=""):
+    def __init__(self, title, price, latitude, longitude, owner_id, amenities, description=""):
         super().__init__()
         if self.validate_title(title):
             self.title = title
@@ -19,14 +19,9 @@ class Place(BaseModel):
         else:
             raise ValueError("latitude invalid")
         self.description = description
-        # Check if owner is a valid User instance
-        if isinstance(owner, User):
-            self.owner = owner
-        else:
-            raise ValueError("invalid user")
+        self.owner = owner_id
         self.reviews = []  # List to store related reviews
-        self.amenities = []  # List to store related amenities
-        owner.add_place(self)
+        self.amenities = [amenities]  # List to store related amenities
 
     @staticmethod
     def validate_title(title):
