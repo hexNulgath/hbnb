@@ -37,11 +37,11 @@ class UserList(Resource):
         """Get all users"""
         user_list = facade.get_all_user()
         if not user_list:
-            return {'error': 'culd not retrive user list'}, 500
+            return {'error': 'user list not found'}, 500
         def serialize(obj):
             if isinstance(obj, User):
                 return {'first_name': obj.first_name, 'last_name': obj.last_name, 'email': obj.email, 'id': obj.id}
-        return json.dumps(user_list, default=serialize), 200
+        return json.dumps(user_list, default=serialize)
         
 @api.route('/<user_id>')
 class UserResource(Resource):
@@ -56,13 +56,11 @@ class UserResource(Resource):
     
     def put(self, user_id):
         user_data = api.payload
-        existing_user = facade.get_user_by_email(user_data['email'])
-        if existing_user:
-            return {'error': 'Email already registered'}, 400
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
+        
         else:
-            facade.update_user(user_id, user_data), 200
+            facade.update_user(user_id, user_data)
 
 
