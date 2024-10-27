@@ -2,10 +2,9 @@ from flask_restx import Namespace, Resource, fields, marshal
 from app.services.facade import HBnBFacade
 
 api = Namespace('places', description='Place operations')
-
 facade = HBnBFacade()
 
-# Define the models for related entities
+# Define related entity models
 amenity_model = api.model('PlaceAmenity', {
     'id': fields.String(description='Amenity ID'),
     'name': fields.String(description='Name of the amenity')
@@ -25,20 +24,19 @@ review_model = api.model('PlaceReview', {
     'user_id': fields.String(description='ID of the user')
 })
 
-# Define the place model for input validation and documentation
+# Place model for marshalling response
 place_model = api.model('Place', {
     'title': fields.String(required=True, description='Title of the place'),
     'description': fields.String(description='Description of the place'),
     'price': fields.Float(required=True, description='Price per night'),
     'latitude': fields.Float(required=True, description='Latitude of the place'),
     'longitude': fields.Float(required=True, description='Longitude of the place'),
-    'owner_id': fields.String(required=True, description='ID of the owner'),
     'owner': fields.Nested(user_model, description='Owner of the place'),
     'amenities': fields.List(fields.Nested(amenity_model), description='List of amenities'),
     'reviews': fields.List(fields.Nested(review_model), description='List of reviews')
 })
 
-# Define an output model for marshalling responses
+# Output model
 place_output_model = api.model('PlaceOutput', {
     'id': fields.String(description='Place ID'),
     'title': fields.String(description='Title of the place'),
@@ -46,38 +44,63 @@ place_output_model = api.model('PlaceOutput', {
     'price': fields.Float(description='Price per night'),
     'latitude': fields.Float(description='Latitude of the place'),
     'longitude': fields.Float(description='Longitude of the place'),
-    'owner': fields.Nested(user_model, description='Owner of the place'),
-    'amenities': fields.List(fields.Nested(amenity_model), description='List of amenities')
+    'owner': fields.Nested(user_model, description='Owner of the place')
+})
+
+# Input model for validation
+place_input_model = api.model('PlaceInput', {
+    'title': fields.String(required=True, description='Title of the place'),
+    'description': fields.String(description='Description of the place'),
+    'price': fields.Float(required=True, description='Price per night'),
+    'latitude': fields.Float(required=True, description='Latitude of the place'),
+    'longitude': fields.Float(required=True, description='Longitude of the place'),
+    'owner_id': fields.String(required=True, description='ID of the owner')
+})
+
+# Listing model for list responses
+place_list_model = api.model('PlaceListing', {
+    'id': fields.String(description='Place ID'),
+    'title': fields.String(description='Title of the place'),
+    'latitude': fields.Float(description='Latitude of the place'),
+    'longitude': fields.Float(description='Longitude of the place')
 })
 
 @api.route('/')
 class PlaceList(Resource):
-    @api.expect(place_model)
+    @api.expect(place_input_model)
     @api.response(201, 'Place successfully created', model=place_output_model)
     @api.response(400, 'Invalid input data')
     @api.response(404, 'User not found')
     def post(self):
         """Register a new place"""
         place_data = api.payload
-        # Try to create the place
+        #user_data = facade.get_user(place_data['owner_id'])
+
+        #if not user_data:
+        #    return {'error': 'User not found'}, 404
+
+        # Add owner object to place data
+        #place_data['owner'] = user_data
+        place_data['owner'] = "placeholder"
+
         try:
             new_place = facade.create_place(place_data)
             if not new_place:
                 return {'error': 'Failed to create place'}, 400
-        except Exception as e:
+        except ValueError as e:
             return {'error': str(e)}, 400
+        except Exception as e:
+            return {'error': 'An internal error occurred'}, 500
 
-        # If successful, return the new place
         return marshal(new_place, place_output_model), 201
-    
-    @api.response(200, 'List of places retrieved successfully', model=[place_output_model])
+
+    @api.response(200, 'List of places retrieved successfully', model=[place_list_model])
     def get(self):
         """Retrieve a list of all places"""
         place_list = facade.get_all_places()
         if not place_list:
             return {'error': 'No place found'}, 404
-        
-        return marshal(place_list, place_output_model), 200
+        return marshal(place_list, place_list_model), 200
 
 @api.route('/<place_id>')
 class PlaceResource(Resource):
@@ -88,9 +111,9 @@ class PlaceResource(Resource):
         place = facade.get_place(place_id)
         if not place:
             return {'error': 'Place not found'}, 404
-        return marshal(place, place_output_model), 200
+        return marshal(place, place_model), 200
 
-    @api.expect(place_model)
+    @api.expect(place_input_model)
     @api.response(200, 'Place updated successfully')
     @api.response(404, 'Place not found')
     @api.response(400, 'Invalid input data')
@@ -100,6 +123,23 @@ class PlaceResource(Resource):
         place = facade.get_place(place_id)
         if not place:
             return {'error': 'Place not found'}, 404
-        
-        facade.update_place(place_id, place_data)
+
+        try:
+            facade.update_place(place_id, place_data)
+        except ValueError as e:
+            return {'error': str(e)}, 400
+        except Exception as e:
+            return {'error': 'An internal error occurred'}, 500
+
         return {'message': 'Place updated successfully'}, 200
+
+@api.route('/<place_id>/reviews')
+class PlaceReviewList(Resource):
+    @api.response(200, 'List of reviews for the place retrieved successfully')
+    @api.response(404, 'Place not found')
+    def get(self, place_id):
+        """Get all reviews for a specific place"""
+        review_list = facade.get_reviews_by_place(place_id)
+        if not review_list:
+            return {'error': 'No reviews found'}, 404
+        return marshal(review_list, review_model), 200

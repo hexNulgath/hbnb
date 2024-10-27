@@ -1,11 +1,11 @@
 from app.models.baseModel import BaseModel
-import app.services.facade as facade
 
 class Review(BaseModel):
     def __init__(self, text, rating, place_id, user_id):
         super().__init__()
+
         # Validate text
-        if text and text is not "":
+        if text and text != "":
             self.text = text
         else:
             raise ValueError("text content is required")
@@ -16,6 +16,7 @@ class Review(BaseModel):
         else:
             raise ValueError("rating must be between 1 and 5")
 
+        # Validate place and user
         if self.place_exists(place_id):
             self.place_id = place_id
         else:
@@ -26,19 +27,18 @@ class Review(BaseModel):
         else:
             raise ValueError("user not found")
 
+    def user_exists(self, user_id):
+#        """Check if the user exists in the database."""
+#        from app.services.facade import HBnBFacade  # Delayed import to avoid circular dependency
+#        facade = HBnBFacade()
+#        user_exist = facade.get_user(user_id)
+#        return user_exist and 'error' not in user_exist
+        return True
 
-    @staticmethod
-    def user_exists(user):
-        """Check if the user exists in the database."""
-        user_exist = facade.HBnBFacade.get_user(user)
-        if user_exist:
-            return True
-        return False
-
-    @staticmethod
-    def place_exists(place):
-        """Check if the place exists in the database."""
-        place_exist = HBnBFacade.get_place(place)
-        if place_exist:
-            return True
-        return False
+    def place_exists(self, place_id):
+    #   """Check if the place exists in the database."""
+    #   from app.services.facade import HBnBFacade  # Delayed import to avoid circular dependency
+    #   facade = HBnBFacade()
+    #   place_exist = facade.get_place(place_id)
+    #   return place_exist and 'error' not in place_exist
+        return True

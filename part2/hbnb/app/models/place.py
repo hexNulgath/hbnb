@@ -1,7 +1,7 @@
 from app.models.baseModel import BaseModel
 
 class Place(BaseModel):
-    def __init__(self, title, price, latitude, longitude, owner_id, amenities, description=""):
+    def __init__(self, title, price, latitude, longitude, owner_id, owner, amenities="", description=""):
         super().__init__()
         if self.validate_title(title):
             self.title = title
@@ -18,14 +18,15 @@ class Place(BaseModel):
         else:
             raise ValueError("latitude invalid")
         self.description = description
-        self.owner = owner_id
+        self.owner_id = owner_id
+        self.owner = owner
         self.reviews = []  # List to store related reviews
         self.amenities = [amenities]  # List to store related amenities
 
     @staticmethod
     def validate_title(title):
-        if title and len(title) > 100:
-            raise ValueError("maximum length of 100 characters")
+        if title and len(title) > 100 or title == "":
+            raise ValueError("title must not be empty and have a maximum length of 100 characters")
         return True 
     
     def add_amenities(self, amenity):
