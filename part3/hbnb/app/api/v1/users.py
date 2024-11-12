@@ -1,6 +1,8 @@
 from flask_restx import Namespace, Resource, fields, marshal
 from app.models.user import User
 from app.services.facade import HBnBFacade
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
 
 api = Namespace('users', description='User operations')
 
@@ -34,16 +36,13 @@ class UserList(Resource):
         """Register a new user"""
         try:
             user_data = api.payload
-            user_data['password'] = User.hash_password(user_data['password'])
             # Check for email uniqueness
             existing_user = facade.get_user_by_email(user_data['email'])
             if existing_user:
                 return marshal({'error': 'Email already registered'}, error_model), 409
-
             new_user = facade.create_user(user_data)
             if not new_user:
                 return marshal({'error': 'Invalid input data'}, error_model), 400
-
             return marshal(new_user, user_output_model), 201
         except ValueError as ve:
             # Handling specific validation errors
@@ -51,6 +50,7 @@ class UserList(Resource):
         except Exception as e:
             # Catch unexpected exceptions to prevent 500 errors
             return marshal({'error': 'An internal error occurred'}, error_model), 500
+    
     
     @api.response(200, 'User details retrieved successfully', model=[user_output_model])
     @api.response(404, 'No users found', model=error_model)
@@ -78,13 +78,24 @@ class UserResource(Resource):
     @api.response(200, 'User updated successfully', model=user_output_model)
     @api.response(404, 'User not found', model=error_model)
     @api.response(400, 'Invalid input data', model=error_model)
+    @jwt_required()
     def put(self, user_id):
         """Update a user by ID"""
         user_data = api.payload
+        current_user_id = get_jwt_identity()
         user = facade.get_user(user_id)
-        if not user:
-            return marshal({'error': 'User not found'}, error_model), 404
-
+        
+        # Authorization check
+        if not user or user.id != current_user_id:
+            return marshal({'error': 'Unauthorized action'}, error_model), 403
+        
+        # Restrict email and password modifications
+        if 'email' in user_data and user_data['email'] != user.email:
+            return marshal({'error': 'You cannot modify the email.'}, error_model), 400
+        if 'password' in user_data and not user.verify_password(user_data['password']):
+            return marshal({'error': 'Incorrect password.'}, error_model), 400
+        
+        # Perform update
         facade.update_user(user_id, user_data)
         updated_user = facade.get_user(user_id)
 

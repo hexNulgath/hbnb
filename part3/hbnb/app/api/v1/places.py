@@ -1,4 +1,5 @@
 from flask_restx import Namespace, Resource, fields, marshal
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services.facade import HBnBFacade
 
 api = Namespace('places', description='Place operations')
@@ -70,10 +71,15 @@ class PlaceList(Resource):
     @api.expect(place_input_model)
     @api.response(201, 'Place successfully created', model=place_output_model)
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     @api.response(404, 'User not found')
     def post(self):
         """Register a new place"""
         place_data = api.payload
+        current_user = get_jwt_identity()
+        place = facade.get_place(place_data['id'])
+        if place != current_user:
+            return {'error': 'Unauthorized action'}, 403
         #user_data = facade.get_user(place_data['owner_id'])
 
         #if not user_data:
@@ -117,13 +123,21 @@ class PlaceResource(Resource):
     @api.response(200, 'Place updated successfully')
     @api.response(404, 'Place not found')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def put(self, place_id):
         """Update a place's information"""
         place_data = api.payload
+        current_user = get_jwt_identity()
+        place = facade.get_place(place_data['id'])
+        if place != current_user:
+            return {'error': 'Unauthorized action'}, 403
+        
         place = facade.get_place(place_id)
         if not place:
             return {'error': 'Place not found'}, 404
 
+
+        
         try:
             facade.update_place(place_id, place_data)
         except ValueError as e:

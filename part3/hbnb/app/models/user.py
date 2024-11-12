@@ -1,4 +1,5 @@
 from app.models.baseModel import BaseModel
+from flask_bcrypt import generate_password_hash, check_password_hash
 import re
 
 MAX_NAME_LENGTH = 50
@@ -10,7 +11,7 @@ class User(BaseModel):
         self.last_name = self.validate_name(last_name)
         self.email = self.validate_email(email)
         self.is_admin = is_admin
-        self.hash_password(password)
+        self.password = self.hash_password(password)
         self.places = []
         self.reviews = []
     
@@ -38,8 +39,8 @@ class User(BaseModel):
 
     def hash_password(self, password):
         """Hashes the password before storing it."""
-        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
+        return generate_password_hash(password).decode('utf-8')
 
     def verify_password(self, password):
         """Verifies if the provided password matches the hashed password."""
-        return bcrypt.check_password_hash(self.password, password)
+        return check_password_hash(self.password, password)
