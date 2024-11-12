@@ -10,7 +10,7 @@ class User(BaseModel):
         self.last_name = self.validate_name(last_name)
         self.email = self.validate_email(email)
         self.is_admin = is_admin
-        _password = self.hash_password(password)
+        self.hash_password(password)
         self.places = []
         self.reviews = []
     

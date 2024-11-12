@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields, marshal
-from models.user import User
+from app.models.user import User
 from app.services.facade import HBnBFacade
 
 api = Namespace('users', description='User operations')
@@ -8,7 +8,7 @@ user_model = api.model('User', {
     'first_name': fields.String(required=True, description='First name of the user'),
     'last_name': fields.String(required=True, description='Last name of the user'),
     'email': fields.String(required=True, description='Email of the user'),
-    'password': fields.string(required=True, description='Password of the user')
+    'password': fields.String(required=True, description='Password of the user')
 })
 
 user_output_model = api.model('UserOutput', {
