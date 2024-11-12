@@ -28,7 +28,7 @@ def create_app(config_class="config.DevelopmentConfig"):
     # Register the Reviews namespace
     api.add_namespace(reviews_ns, path='/api/v1/reviews')
     # Register the Reviews namespace
-    api.add_namespace(login_ns, path='/api/v1/auth/')
+    api.add_namespace(login_ns, path='/api/v1')
 
     bcrypt.init_app(app)
     jwt.init_app(app)

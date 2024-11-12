@@ -1,9 +1,8 @@
 from flask_restx import Namespace, Resource, fields, marshal
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.services.facade import HBnBFacade
+from app.services import facade
 
 api = Namespace('places', description='Place operations')
-facade = HBnBFacade()
 
 # Define related entity models
 amenity_model = api.model('PlaceAmenity', {
@@ -77,17 +76,17 @@ class PlaceList(Resource):
         """Register a new place"""
         place_data = api.payload
         current_user = get_jwt_identity()
-        place = facade.get_place(place_data['id'])
-        if place != current_user:
+        place_owner = place_data['owner_id']
+        if place_owner != current_user["id"]:
             return {'error': 'Unauthorized action'}, 403
-        #user_data = facade.get_user(place_data['owner_id'])
+        
+        user_data = facade.get_user(place_owner)
 
-        #if not user_data:
-        #    return {'error': 'User not found'}, 404
+        if not user_data:
+           return {'error': 'User not foundi'}, 404
 
         # Add owner object to place data
-        #place_data['owner'] = user_data
-        place_data['owner'] = "placeholder"
+        place_data['owner'] = user_data
 
         try:
             new_place = facade.create_place(place_data)
@@ -134,10 +133,7 @@ class PlaceResource(Resource):
         
         place = facade.get_place(place_id)
         if not place:
-            return {'error': 'Place not found'}, 404
-
-
-        
+            return {'error': 'Place not found'}, 404 
         try:
             facade.update_place(place_id, place_data)
         except ValueError as e:

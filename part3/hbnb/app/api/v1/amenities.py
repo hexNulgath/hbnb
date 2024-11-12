@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields, marshal
-from app.services.facade import HBnBFacade
+from app.services import facade
 from app.models.amenity import Amenity
 
 api = Namespace('amenities', description='Amenity operations')
@@ -14,8 +14,6 @@ amenity_output_model = api.model('AmenityOutput', {
     'id': fields.String(description='The amenity ID'),
     'name': fields.String(description='The amenity name'),
 })
-
-facade = HBnBFacade()
 
 @api.route('/')
 class AmenityList(Resource):

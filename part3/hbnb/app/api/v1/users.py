@@ -1,6 +1,5 @@
 from flask_restx import Namespace, Resource, fields, marshal
-from app.models.user import User
-from app.services.facade import HBnBFacade
+from app.services import facade
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 
@@ -23,8 +22,6 @@ user_output_model = api.model('UserOutput', {
 error_model = api.model('Error', {
     'error': fields.String(description='Error message')
 })
-
-facade = HBnBFacade()
 
 @api.route('/')
 class UserList(Resource):

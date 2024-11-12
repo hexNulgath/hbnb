@@ -1,6 +1,6 @@
 from flask_restx import Namespace, Resource, fields, marshal
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.services.facade import HBnBFacade
+from app.services import facade
 
 api = Namespace('reviews', description='Review operations')
 
@@ -32,7 +32,6 @@ review_output_model = api.model('Review_output', {
     'rating': fields.Integer(required=True, description='Rating of the place (1-5)')
 })
 
-facade = HBnBFacade()
 
 @api.route('/')
 class ReviewList(Resource):
