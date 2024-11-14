@@ -153,3 +153,27 @@ class PlaceReviewList(Resource):
         if not review_list:
             return {'error': 'No reviews found'}, 404
         return marshal(review_list, review_model), 200
+
+@api.expect(place_input_model)
+@api.response(200, 'Place updated successfully')
+@api.response(404, 'Place not found')
+@api.response(400, 'Invalid input data')
+@api.route('/places/<place_id>')
+class AdminPlaceModify(Resource):
+    @jwt_required()
+    def put(self, place_id):
+        current_user = get_jwt_identity()
+        place_data = api.payload
+
+        # Set is_admin default to False if not exists
+        is_admin = current_user.get('is_admin', False)
+        user_id = current_user.get('id')
+
+        place = facade.get_place(place_id)
+        if not is_admin and place.owner_id != user_id:
+            return {'error': 'Unauthorized action'}, 403
+
+        # Logic to update the place
+        facade.update_place(place_id, place_data)
+        return {'message': 'Place updated successfully'}, 200
+
