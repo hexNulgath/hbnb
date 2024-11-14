@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 from flask_restx import Api
 from flask_bcrypt import Bcrypt
 from app.api.v1.users import api as users_ns
@@ -11,6 +12,8 @@ from flask_jwt_extended import JWTManager
 jwt = JWTManager()
 
 bcrypt = Bcrypt()
+
+db = SQLAlchemy()
 
 
 def create_app(config_class="config.DevelopmentConfig"):
@@ -32,5 +35,6 @@ def create_app(config_class="config.DevelopmentConfig"):
 
     bcrypt.init_app(app)
     jwt.init_app(app)
+    db.init_app(app)
 
     return app
