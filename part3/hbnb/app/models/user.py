@@ -1,10 +1,18 @@
 from app.models.baseModel import BaseModel
+from app import db, bcrypt
 from flask_bcrypt import generate_password_hash, check_password_hash
 import re
 
 MAX_NAME_LENGTH = 50
 
 class User(BaseModel):
+    __tablename__ = 'users'
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True)
+    password = db.Column(db.String(128), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+
     def __init__(self, first_name, last_name, email, password, is_admin=False):
         super().__init__()
         self.first_name = self.validate_name(first_name)
