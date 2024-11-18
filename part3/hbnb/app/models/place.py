@@ -1,6 +1,15 @@
 from app.models.baseModel import BaseModel
+from app import db, bcrypt
 
 class Place(BaseModel):
+    __tablename__ = 'place'
+    id = db.Column(db.Integer, nullable=False, unique=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String, nullable=True)
+    price = db.Column(db.Float, nullable=False)
+    latitude = db.Column(db.Float, default=False)
+    longitude = db.Column(db.Float, default=False)
+
     def __init__(self, title, price, latitude, longitude, owner_id, owner, amenities="", description=""):
         super().__init__()
         if self.validate_title(title):

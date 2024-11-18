@@ -1,6 +1,11 @@
 from app.models.baseModel import BaseModel
+from app import db, bcrypt
 
 class Amenity(BaseModel):
+    __tablename__ = 'amenity'
+    id = db.Column(db.Integer, nullable=False, unique=True)
+    name = db.Column(db.String, nullable=False)
+
     def __init__(self, name):
         super().__init__()
         if self.validate_name(name):

@@ -1,6 +1,12 @@
 from app.models.baseModel import BaseModel
+from app import db, bcrypt
 
 class Review(BaseModel):
+    __tablename__ = 'review'
+    id = db.Column(db.Integer, nullable=False, unique=True)
+    text = db.Column(db.String, nullable=False)
+    rating = db.Column(db.integer, nullable=True)
+
     def __init__(self, text, rating, place_id, user_id):
         super().__init__()
 
