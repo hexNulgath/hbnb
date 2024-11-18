@@ -107,6 +107,7 @@ class UserResource(Resource):
     class AdminUserCreate(Resource):
         @jwt_required()
         def post(self):
+            """Create user using admin jws"""
             current_user = get_jwt_identity()
             if not current_user.get('is_admin'):
                 return {'error': 'Admin privileges required'}, 403
@@ -131,6 +132,7 @@ class UserResource(Resource):
     class AdminUserModify(Resource):
         @jwt_required()
         def put(self, user_id):
+            """Update user using admin jws"""
             current_user = get_jwt_identity()
             if not current_user.get('is_admin'):
                 return {'error': 'Admin privileges required'}, 403
