@@ -1,49 +1,58 @@
 from app.models.baseclass import BaseModel
+from app import db
+
 
 class Review(BaseModel):
     __tablename__ = 'review'
-    id = db.Column(db.Integer, nullable=False, unique=True)
-    text = db.Column(db.String, nullable=False)
-    rating = db.Column(db.integer, nullable=True)
+    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)  # Primary Key
+    text = db.Column(db.String(500), nullable=False)  # Max length constraint for text
+    rating = db.Column(db.Integer, nullable=True)  # Fixed typo in db.Integer
+    place_id = db.Column(db.Integer, db.ForeignKey('place.id'), nullable=False)  # Foreign Key to Place
+    user_id = db.Column(db.Integer, db.ForeignKey('user_repository.id'), nullable=False)  # Foreign Key to User
 
     def __init__(self, text, rating, place_id, user_id):
         super().__init__()
-
+        
         # Validate text
-        if text and text != "":
-            self.text = text
-        else:
-            raise ValueError("text content is required")
+        self.text = self.validate_text(text)
+        
+        # Validate rating
+        self.rating = self.validate_rating(rating)
+        
+        # Validate place and user existence
+        self.place_id = self.validate_place(place_id)
+        self.user_id = self.validate_user(user_id)
 
-        # Validate rating between 1 and 5
-        if 1 <= rating <= 5:
-            self.rating = rating
-        else:
-            raise ValueError("rating must be between 1 and 5")
+    @staticmethod
+    def validate_text(text):
+        """Ensure text is not empty and within the allowed length."""
+        if not text or text.strip() == "":
+            raise ValueError("Text content is required.")
+        if len(text) > 500:
+            raise ValueError("Text exceeds maximum length of 500 characters.")
+        return text
 
-        # Validate place and user
-        if self.place_exists(place_id):
-            self.place_id = place_id
-        else:
-            raise ValueError("place not found")  
-              
-        if self.user_exists(user_id):
-            self.user_id = user_id
-        else:
-            raise ValueError("user not found")
+    @staticmethod
+    def validate_rating(rating):
+        """Ensure rating is between 1 and 5."""
+        if rating is not None and (rating < 1 or rating > 5):
+            raise ValueError("Rating must be between 1 and 5.")
+        return rating
 
-    def user_exists(self, user_id):
-#        """Check if the user exists in the database."""
-#        from app.services.facade import HBnBFacade  # Delayed import to avoid circular dependency
-#        facade = HBnBFacade()
-#        user_exist = facade.get_user(user_id)
-#        return user_exist and 'error' not in user_exist
-        return True
+    def validate_user(self, user_id):
+        """Check if the user exists in the database."""
+        from app.services.facade import HBnBFacade  # Delayed import to avoid circular dependency
+        facade = HBnBFacade()
+        user = facade.get_user(user_id)
+        if not user or 'error' in user:
+            raise ValueError(f"User with ID {user_id} not found.")
+        return user_id
 
-    def place_exists(self, place_id):
-    #   """Check if the place exists in the database."""
-    #   from app.services.facade import HBnBFacade  # Delayed import to avoid circular dependency
-    #   facade = HBnBFacade()
-    #   place_exist = facade.get_place(place_id)
-    #   return place_exist and 'error' not in place_exist
-        return True
+    def validate_place(self, place_id):
+        """Check if the place exists in the database."""
+        from app.services.facade import HBnBFacade  # Delayed import to avoid circular dependency
+        facade = HBnBFacade()
+        place = facade.get_place(place_id)
+        if not place or 'error' in place:
+            raise ValueError(f"Place with ID {place_id} not found.")
+        return place_id
