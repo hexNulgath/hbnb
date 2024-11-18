@@ -1,5 +1,4 @@
-from app.models.baseModel import BaseModel
-from app import db, bcrypt
+from app.models.baseclass import BaseModel
 
 class Review(BaseModel):
     __tablename__ = 'review'

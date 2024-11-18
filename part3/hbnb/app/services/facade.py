@@ -1,25 +1,25 @@
-from app.services.repositories.user_repository import UserRepository
 from app.models.user import User
 from app.models.amenity import Amenity
 from app.models.place import Place
 from app.models.review import Review
+from app.persistence.user_repository import UserRepository
 
 class HBnBFacade:
     def __init__(self):
-        self.user_repo = UserRepository(User)
+        self.user_repo = UserRepository()
 
-    #Users
     def create_user(self, user_data):
         user = User(**user_data)
         user.hash_password(user_data['password'])
-        self.user_repo.add(user)
+        self.user_repository.add(user)
         return user
-    
+
+    def get_user_by_id(self, user_id):
+        return self.user_repository.get(user_id)
+
     def get_all_users(self):
-        return self.user_repo.get_all()
-    
-    def get_user(self, user_id):
-        return self.user_repo.get(user_id)
+        return self.user_repository.get_all()
+
 
     def update_user(self, user_id, data):
         return self.user_repo.update(user_id, data)
