@@ -18,6 +18,7 @@ Moreover, this document will serve as a guide for further improvements and the u
 compromising the stability and efficiency of the established system.
 
 # High-Level Architecture
+![High-Level_Package_Diagram](https://github.com/user-attachments/assets/43b97c99-4101-410d-b026-6e108c8e8bb4)
 ## Layer system
 The system architecture is based on a layered approach and uses the facade pattern to simplify the interactions between the user and the system. It can be decomposed into three layers: presentation, business logic
 and persistence. Each of these layers will play a distinctive and important role in ensuring that the application functions smoothly and that it accomplishes the requirements of the users
@@ -44,6 +45,8 @@ It contains the logical core of the business and processes the essential operati
 Manages the persistence of data, and the communication with the database. It allows to storage and load of data, ensuring that the information remains coherent. The database contains information about users, properties, reviews, and ratings
 
 # Business Logic Layer
+![Class-Diagram](https://github.com/user-attachments/assets/6138af11-7cc5-4d22-9e5b-1b4c51299bef)
+
 ## Description
 This diagram presents the entities of the logical layer, showing their attributes and methods. Includes: Users, Places, Amenities, and Reviews.
   1. User Class
