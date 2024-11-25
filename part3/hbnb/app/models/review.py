@@ -1,18 +1,13 @@
 from app.models.baseclass import BaseModel
 from app import db
 
-
-
 class Review(BaseModel):
     __tablename__ = 'review'
     id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)  # Primary Key
     text = db.Column(db.String(500), nullable=False)  # Max length constraint for text
     rating = db.Column(db.Integer, nullable=True)  # Fixed typo in db.Integer
-    place_id = db.Column(db.Integer, db.ForeignKey('place.id'), nullable=False)  # Foreign Key to Place
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Foreign Key to User
-    user = db.relationship('users', backref='review', lazy=True)
-    place = db.relationship('places', backref='review', lazy=True)
-    
+    place_id = db.Column(db.Integer, db.ForeignKey('places.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     def __init__(self, text, rating, place_id, user_id):
         super().__init__()

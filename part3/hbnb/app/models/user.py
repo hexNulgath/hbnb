@@ -1,10 +1,7 @@
 import re
-from flask_bcrypt import bcrypt, Bcrypt
 from app import db, bcrypt
 from .baseclass import BaseModel
 from sqlalchemy.orm import validates, relationship
-
-bcrypt = Bcrypt()
 
 class User(BaseModel):
     __tablename__ = 'users'
@@ -12,22 +9,31 @@ class User(BaseModel):
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False) 
     email = db.Column(db.String(120), nullable=False, unique=True) 
-    password = db.Column(db.String(128), nullable=False) 
+    _password = db.Column("password", db.String(128), nullable=False) 
     is_admin = db.Column(db.Boolean, default=False) 
-    places = relationship('Place', backref='User', lazy=True)
-    reviews = relationship('review', backref='user', lazy=True)
 
-
-    @staticmethod
     @validates('email')
-    def validate_email(email):
+    def validate_email(self, key, email):
         """Check if email format is valid."""
         pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
         if re.match(pattern, email):
             return email
         raise ValueError("Invalid email format")
 
-    def serializar_usuario(self):
+    @property
+    def password(self):
+        raise AttributeError("Password is not readable")
+
+    @password.setter
+    def password(self, raw_password):
+        self._password = bcrypt.generate_password_hash(raw_password).decode('utf-8')
+
+    def verify_password(self, password):
+        """Verifies if the provided password matches the hashed password."""
+        return bcrypt.check_password_hash(self._password, password)
+
+    def serialize_user(self):
+        """Serialize the user object."""
         return {
             "id": self.id,
             "first_name": self.first_name,
@@ -35,23 +41,22 @@ class User(BaseModel):
             "email": self.email
         }
 
-    def hash_password(self, password):
-        """Hashes the password before storing it."""
-        return bcrypt.generate_password_hash(password).decode('utf-8')
-
-    def verify_password(self, password):
-        """Verifies if the provided password matches the hashed password."""
-        return bcrypt.check_password_hash(self.password, password)
-    
-
     def add_review(self, review):
         """Link a review to the user."""
-        self.reviews.append(review)
-        db.session.add(self)
-        db.session.commit()
+        try:
+            self.reviews.append(review)
+            db.session.add(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise ValueError(f"Failed to add review: {e}")
 
     def add_place(self, place):
         """Add a place to the user."""
-        self.places.append(place)
-        db.session.add(self)
-        db.session.commit()
+        try:
+            self.places.append(place)
+            db.session.add(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise ValueError(f"Failed to add place: {e}")

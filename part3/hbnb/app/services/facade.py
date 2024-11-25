@@ -6,23 +6,26 @@ from app.persistence.user_repository import UserRepository
 from app.persistence.place_repository import PlaceRepository
 from app.persistence.review_repository import ReviewRepository
 from app.persistence.amenity_repository import AmenityRepository
+from app.persistence.repository import SQLAlchemyRepository
 
 
 
 class HBnBFacade:
     def __init__(self):
         self.user_repo = UserRepository()
-        self.place_repo = PlaceRepository()  
-        self.review_repo = ReviewRepository()
-        self.amenity_repo = AmenityRepository() 
+        self.place_repo = SQLAlchemyRepository(Place)
+        self.review_repo = SQLAlchemyRepository(Review)
+        self.amenity_repo = SQLAlchemyRepository(Amenity)
 
     def create_user(self, user_data):
-        user = User(**user_data)
-        user.hash_password(user_data['password'])
-        self.user_repo.add(user)
-        return user
+        try:
+            user = User(**user_data)
+            self.user_repo.add(user)
+            return user
+        except Exception as e:
+            raise ValueError(f"Failed to create user: {e}")
 
-    def get_user_by_id(self, user_id):
+    def get_user(self, user_id):
         return self.user_repo.get(user_id)
 
     def get_all_users(self):
@@ -67,7 +70,7 @@ class HBnBFacade:
     def update_amenity(self, amenity_id, amenity_data):
         return self.amenity_repo.update(amenity_id, amenity_data)
     
-    #Reviewa
+    #Review
     def create_review(self, review_data):
         review = Review(**review_data)
         self.review_repo.add(review)

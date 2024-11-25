@@ -1,5 +1,4 @@
-from datetime import timedelta
-from flask import Flask
+from flask import Flask, jsonify
 from flask_restx import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
@@ -9,7 +8,6 @@ from flask_jwt_extended import JWTManager
 bcrypt = Bcrypt()
 jwt = JWTManager()
 db = SQLAlchemy()
-
 
 def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
@@ -26,7 +24,7 @@ def create_app(config_class="config.DevelopmentConfig"):
     from app.api.v1.auth import api as login_ns
 
     api.add_namespace(users_ns, path='/api/v1/users')
-    api.add_namespace(amenities_ns, path='/api/v1/amenities')  # Fixed typo
+    api.add_namespace(amenities_ns, path='/api/v1/amenities')
     api.add_namespace(places_ns, path='/api/v1/places')
     api.add_namespace(reviews_ns, path='/api/v1/reviews')
     api.add_namespace(login_ns, path='/api/v1')
@@ -35,5 +33,10 @@ def create_app(config_class="config.DevelopmentConfig"):
     db.init_app(app)
     bcrypt.init_app(app)
     jwt.init_app(app)
+
+    # Global error handler
+    @app.errorhandler(Exception)
+    def handle_exception(e):
+        return jsonify({"error": str(e)}), 500
 
     return app

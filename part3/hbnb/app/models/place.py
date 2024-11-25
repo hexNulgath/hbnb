@@ -2,17 +2,15 @@ from app.models.baseclass import BaseModel
 from app import db
 
 class Place(BaseModel):
-    __tablename__ = 'place'
-    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)  # Added primary_key=True
+    __tablename__ = 'places'
+
+    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String, nullable=True)
     price = db.Column(db.Float, nullable=False)
-    latitude = db.Column(db.Float, nullable=False)  # Removed default, as coordinates must be specified
-    longitude = db.Column(db.Float, nullable=False)  # Same as above
-    owner_id = db.Column(db.Integer, nullable=False)  # Added owner_id for ForeignKey (if applicable)
-    reviews = db.relationship('review', backref='place', lazy=True)
-    amenities =  db.relationship('amenities', secondary='place_amenities', backref='places')
-
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))  # ForeignKey for owner
 
     def __init__(self, title, price, latitude, longitude, owner_id, description=""):
         super().__init__()
