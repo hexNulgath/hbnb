@@ -67,6 +67,7 @@ and corresponding reviews. The design facilitates future system expansion and en
 
 # API Interaction Flow
 ##User Registration
+![register](https://github.com/user-attachments/assets/854553ca-4367-42b2-a38d-267d5ee85a44)
 
 ###Overview:
 The sequence diagram illustrates the interaction flow between system components during the process of registering a new user. This process is crucial as it lays the foundation for users to access all application functionalities.
@@ -112,6 +113,7 @@ This sequence diagram provides a visual representation of the user registration 
 as it offers a clear understanding of how registration is performed and how user data is managed on the platform.
 
 ## Sequence Diagram: Creating a Place Listing
+![register place](https://github.com/user-attachments/assets/8f786df9-12d2-4635-8e82-b6ecb9c61d55)
 
 ### Overview:
 The sequence diagram illustrates the interaction flow between system components during the process of creating a new place listing by a user. This process is essential as it allows hosts to add available properties for rent on the platform.
@@ -150,6 +152,7 @@ This sequence diagram effectively illustrates the process of creating a new plac
 providing a clear understanding of how this process is executed and how place data is managed on the platform.
 
 ##Sequence Diagram: Review Submission
+![register review](https://github.com/user-attachments/assets/341016b5-e829-4653-af6e-43ded8a1e3ae)
 
 ###Overview:
 The sequence diagram illustrates the interaction flow between system components during the process of submitting a review by a user for a specific place. This process is essential for encouraging feedback and helping other users in their decision-making process.
@@ -188,6 +191,7 @@ This sequence diagram effectively illustrates the process of submitting a review
 providing a clear understanding of how this process is carried out and how reviews are managed on the platform.
 
 ## Sequence Diagram: Request for a List of Places
+![list place](https://github.com/user-attachments/assets/058bffe6-37c8-4b9c-91d3-3b9c6f068edf)
 
 ### Overview:
 The sequence diagram illustrates the interaction flow between system components during the process where a user requests a list of places based on certain criteria. This process is crucial in helping users find accommodation options that match their needs and preferences.
